@@ -14,7 +14,7 @@ os.makedirs(output_folder, exist_ok=True)
 # Read Image
 # =====================================
 
-image_path = "output/20_final_leaf.jpg"
+image_path = "../dataset/test/hibiscus1.jpeg"
 
 image = cv2.imread(image_path)
 
