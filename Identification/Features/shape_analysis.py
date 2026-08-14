@@ -3,48 +3,34 @@ import numpy as np
 import os
 import pandas as pd
 
-
-# =====================================
-# Create Output Folder
-# =====================================
-
-output_folder = "output/21_shape_analysis"
-os.makedirs(output_folder, exist_ok=True)
-
-
 # =====================================
 # Shape Feature Extraction Function
 # =====================================
 
 def extract_shape_features(image):
-
+    """
+    Extracts scale-invariant shape features from a preprocessed leaf image.
+    Returns a dictionary of features, or None if extraction fails.
+    """
     if image is None:
-        print("❌ Error: Image not found!")
+        print("[-] Error: Image is None.")
         return None
 
-    print("✅ Leaf image loaded successfully.")
-
-    # -------------------------------
     # Convert to Grayscale
-    # -------------------------------
+    if len(image.shape) == 3:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = image.copy()
 
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # -------------------------------
-    # Binary Threshold
-    # -------------------------------
-
+    # Binary Threshold to isolate the leaf silhouette
     _, thresh = cv2.threshold(
         gray,
-        0,
+        10,
         255,
-        cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        cv2.THRESH_BINARY
     )
 
-    # -------------------------------
     # Find Contours
-    # -------------------------------
-
     contours, _ = cv2.findContours(
         thresh,
         cv2.RETR_EXTERNAL,
@@ -52,119 +38,91 @@ def extract_shape_features(image):
     )
 
     if len(contours) == 0:
-        print("❌ No leaf detected.")
+        print("[-] No leaf contours found in image.")
         return None
 
-    # -------------------------------
-    # Largest Contour
-    # -------------------------------
-
+    # Get largest contour (which is the leaf)
     largest_contour = max(contours, key=cv2.contourArea)
-
-    # -------------------------------
-    # Shape Features
-    # -------------------------------
-
     area = cv2.contourArea(largest_contour)
+    perimeter = cv2.arcLength(largest_contour, True)
 
-    perimeter = cv2.arcLength(
-        largest_contour,
-        True
-    )
+    if area == 0:
+        print("[-] Leaf contour area is zero.")
+        return None
 
-    # -------------------------------
-    # Draw Contour
-    # -------------------------------
+    # 1. Aspect Ratio (Width / Height of bounding box)
+    x, y, w, h = cv2.boundingRect(largest_contour)
+    aspect_ratio = float(w) / h if h > 0 else 0.0
 
-    result = image.copy()
+    # 2. Circularity / Compactness (4 * pi * Area / Perimeter^2)
+    circularity = (4.0 * np.pi * area) / (perimeter ** 2) if perimeter > 0 else 0.0
 
-    cv2.drawContours(
-        result,
-        [largest_contour],
-        -1,
-        (0, 255, 0),
-        2
-    )
+    # 3. Solidity (Area / Convex Hull Area)
+    hull = cv2.convexHull(largest_contour)
+    hull_area = cv2.contourArea(hull)
+    solidity = float(area) / hull_area if hull_area > 0 else 0.0
 
-    cv2.putText(
-        result,
-        f"Area : {area:.2f}",
-        (20, 30),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.7,
-        (255, 0, 0),
-        2
-    )
+    # 4. Extent (Area / Bounding Box Area)
+    bbox_area = float(w * h)
+    extent = area / bbox_area if bbox_area > 0 else 0.0
 
-    cv2.putText(
-        result,
-        f"Perimeter : {perimeter:.2f}",
-        (20, 60),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.7,
-        (255, 0, 0),
-        2
-    )
+    # 5. Eccentricity (using fitted ellipse semi-axes)
+    eccentricity = 0.0
+    if len(largest_contour) >= 5:
+        try:
+            (x_ell, y_ell), (MA, ma), angle = cv2.fitEllipse(largest_contour)
+            a = max(MA, ma) / 2.0
+            b = min(MA, ma) / 2.0
+            eccentricity = np.sqrt(a**2 - b**2) / a if a > 0 else 0.0
+        except Exception:
+            pass
 
-    # -------------------------------
-    # Save Image
-    # -------------------------------
+    # Alternative eccentricity calculation from moments if ellipse fitting failed
+    if eccentricity == 0.0:
+        moments = cv2.moments(largest_contour)
+        mu20 = moments['mu20']
+        mu02 = moments['mu02']
+        mu11 = moments['mu11']
+        diff = mu20 - mu02
+        sum_mu = mu20 + mu02
+        if sum_mu > 0:
+            eccentricity = np.sqrt(diff**2 + 4 * mu11**2) / sum_mu
 
-    output_image = os.path.join(
-        output_folder,
-        "shape_analysis.jpg"
-    )
+    # 6. Hu Moments (scale, translation, and rotation invariant)
+    moments = cv2.moments(largest_contour)
+    hu = cv2.HuMoments(moments).flatten()
+    
+    # Log-transform Hu moments to make them comparable
+    hu_log = []
+    for val in hu:
+        if val != 0:
+            hu_log.append(-1.0 * np.sign(val) * np.log10(np.abs(val)))
+        else:
+            hu_log.append(0.0)
 
-    cv2.imwrite(output_image, result)
-
-    # -------------------------------
-    # Save CSV
-    # -------------------------------
-
-    df = pd.DataFrame({
-        "Area": [area],
-        "Perimeter": [perimeter]
-    })
-
-    csv_path = os.path.join(
-        output_folder,
-        "shape_features.csv"
-    )
-
-    df.to_csv(csv_path, index=False)
-
-    # -------------------------------
-    # Print Results
-    # -------------------------------
-
-    print("\n========== Shape Features ==========")
-
-    print(f"Leaf Area      : {area:.2f} pixels²")
-    print(f"Leaf Perimeter : {perimeter:.2f} pixels")
-
-    print("\n✅ Shape Analysis Completed")
-
-    print(f"📷 Image Saved : {output_image}")
-    print(f"📄 CSV Saved   : {csv_path}")
-
-    return {
-        "Area": area,
-        "Perimeter": perimeter
+    # Compile shape features dictionary
+    features = {
+        "shape_aspect_ratio": aspect_ratio,
+        "shape_circularity": circularity,
+        "shape_solidity": solidity,
+        "shape_extent": extent,
+        "shape_eccentricity": eccentricity,
+        "shape_hu_1": hu_log[0],
+        "shape_hu_2": hu_log[1],
+        "shape_hu_3": hu_log[2]
     }
 
-
-# =====================================
-# Main Function
-# =====================================
+    return features
 
 if __name__ == "__main__":
-
-    image_path = "../../dataset/test/hibiscus1.jpeg"
-
-    image = cv2.imread(image_path)
-
-    features = extract_shape_features(image)
-
-    if features is not None:
-        print("\nReturned Features:")
-        print(features)
+    # Test script on one of the healthy dataset leaves
+    test_path = "../../dataset/healthy/leaf1.jpeg"
+    if os.path.exists(test_path):
+        img = cv2.imread(test_path)
+        print("Testing feature extraction on:", test_path)
+        feats = extract_shape_features(img)
+        print("Extracted Shape Features:")
+        for k, v in feats.items():
+            print(f"  {k}: {v:.6f}")
+    else:
+        print(f"Could not find test image at {test_path}")
