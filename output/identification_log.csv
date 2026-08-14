@@ -9,3 +9,6 @@ timestamp,image_path,is_hibiscus,confidence,message
 2026-08-14 20:35:26,dataset/Non-hibiscus\non_hibiscus_clutter_0.jpg,False,0.14,Rejected: Not verified as a Hibiscus leaf (confidence 0.14 is below threshold 0.40).
 2026-08-14 20:36:30,path/to/your/image.jpg,False,0.0,Rejection: Image preprocessing failed (no valid leaf shape found).
 2026-08-14 20:42:35,C:\Users\THEJASWI NAYAK\Desktop\Web Dev\Hibiscus_Preprocessing-main\dataset\Non-hibiscus\non_hibiscus_clutter_1.jpg,False,0.1,Rejected: Not verified as a Hibiscus leaf (confidence 0.10 is below threshold 0.40).
+2026-08-14 23:20:21,dataset/test/hibiscus1.jpeg,True,0.68,Accepted: Verified as a Hibiscus leaf with confidence 0.68.
+2026-08-14 23:20:22,dataset/Non-hibiscus/other_leaf_maple.png,False,0.16,Rejected: Not verified as a Hibiscus leaf (confidence 0.16 is below threshold 0.40).
+2026-08-14 23:20:27,dataset/Non-hibiscus\non_hibiscus_clutter_0.jpg,False,0.14,Rejected: Not verified as a Hibiscus leaf (confidence 0.14 is below threshold 0.40).
