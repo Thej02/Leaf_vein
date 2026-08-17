@@ -222,6 +222,7 @@ def preprocess_image(image_path, save_outputs=False, output_folder="output"):
         "original": img,
         "preprocessed": refined_leaf,
         "binary_mask": binary_mask,
+        "full_leaf_mask": leaf_mask,
         "skeleton": skeleton,
         "vein_enhancement": vein_enhancement,
         "sharpness": laplacian_variance,
