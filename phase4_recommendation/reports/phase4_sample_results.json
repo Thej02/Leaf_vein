@@ -1,0 +1,62 @@
+{
+    "Healthy Hibiscus Leaf": {
+        "timestamp": "2026-08-18 01:32:55",
+        "image_path": "dataset/healthy/hibiscus_gen_1.png",
+        "species": "hibiscus",
+        "health": "Healthy",
+        "deficiency": "none",
+        "severity": "none",
+        "recommendation": "The leaf appears healthy and well-nourished. Continue regular watering and care. No corrective fertilizer application is needed.",
+        "confidence": {
+            "species_confidence": 0.66,
+            "health_confidence": 0.7529408801196169,
+            "deficiency_confidence": 0.0,
+            "severity_score": 0.0
+        }
+    },
+    "Chlorotic Unhealthy Leaf": {
+        "timestamp": "2026-08-18 01:32:59",
+        "image_path": "dataset/unhealthy/chlorosis/chlorosis_1.jpg",
+        "species": "hibiscus",
+        "health": "Unhealthy",
+        "deficiency": "chlorosis",
+        "severity": "moderate",
+        "recommendation": "Moderate chlorosis. Supplement with a balanced NPK fertilizer (e.g., 10-10-10) or blood meal. If veins remain green while tissue turns yellow (interveinal chlorosis), apply chelated iron foliar spray.",
+        "confidence": {
+            "species_confidence": 0.4,
+            "health_confidence": 0.6208348759910159,
+            "deficiency_confidence": 0.8682950407468104,
+            "severity_score": 0.2632184446051392
+        }
+    },
+    "Necrotic Unhealthy Leaf": {
+        "timestamp": "2026-08-18 01:33:00",
+        "image_path": "dataset/unhealthy/necrosis/necrosis_1.jpg",
+        "species": "not_hibiscus",
+        "health": "unknown",
+        "deficiency": "none",
+        "severity": "none",
+        "recommendation": "Rejection: Rejected: Not verified as a Hibiscus leaf (confidence 0.32 is below threshold 0.40).",
+        "confidence": {
+            "species_confidence": 0.32,
+            "health_confidence": 0.0,
+            "deficiency_confidence": 0.0,
+            "severity_score": 0.0
+        }
+    },
+    "Scorched Unhealthy Leaf": {
+        "timestamp": "2026-08-18 01:33:01",
+        "image_path": "dataset/unhealthy/scorch/scorch_1.jpg",
+        "species": "hibiscus",
+        "health": "Unhealthy",
+        "deficiency": "scorch",
+        "severity": "severe",
+        "recommendation": "Severe marginal leaf scorch. Apply a water-soluble potassium fertilizer for quick root uptake. Trim severely dried or burnt margins to prevent further tissue tearing.",
+        "confidence": {
+            "species_confidence": 0.58,
+            "health_confidence": 0.3789168681894311,
+            "deficiency_confidence": 0.88309157345063,
+            "severity_score": 0.48358476071767453
+        }
+    }
+}
