@@ -1,0 +1,43 @@
+{
+    "model_name": "SVM",
+    "overall_accuracy": 1.0,
+    "macro_metrics": {
+        "f1_score": 1.0,
+        "precision": 1.0,
+        "recall": 1.0
+    },
+    "per_class_metrics": {
+        "chlorosis": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0
+        },
+        "necrosis": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0
+        },
+        "scorch": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0
+        }
+    },
+    "confusion_matrix": [
+        [
+            6,
+            0,
+            0
+        ],
+        [
+            0,
+            6,
+            0
+        ],
+        [
+            0,
+            0,
+            6
+        ]
+    ]
+}
